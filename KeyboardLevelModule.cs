@@ -284,6 +284,7 @@ namespace GPSTool
             else
             {
                 txtInput.text = "Error, wrong format entered";
+                errorInput = true;
             }
         }
         public void ClickButtonClear()

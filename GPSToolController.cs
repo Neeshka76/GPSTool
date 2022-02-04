@@ -36,12 +36,16 @@ namespace GPSTool
         public bool PlayerTeleportPositionDistanceMaxButtonPressedGetSet { get; set; }
         // Set if Player has pressed the button Teleport To Spawn
         public bool PlayerTeleportToSpawnButtonPressedGetSet { get; set; }
+        // Set if Player has pressed the button Teleport To End Of Dungeon
+        public bool PlayerTeleportToEndOfDungeonButtonPressedGetSet { get; set; }
         // Set if Keyboard has pressed enter button finish
         public bool KeyboardFinishEnterButtonPressedGetSet { get; set; }
         // Info that the player has confirm the teleportation
         public bool PlayerTeleportPositionConfirmButtonPressedGetSet { get; set; }
         // Toggle the arrow indicator
         public bool ToggleArrowsIndicatorGetSet { get; set; }
+        // Toggle the arrow to Exit
+        public bool ToggleArrowToExitGetSet { get; set; }
         // Toggle the Pointer to teleport
         public bool PointToTeleportGetSet { get; set; }
         // Set if has to refresh the position

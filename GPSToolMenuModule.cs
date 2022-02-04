@@ -11,6 +11,7 @@ namespace GPSTool
         private Text txtPlayerPositionY;
         private Text txtPlayerPositionZ;
         private Button btnArrowsIndicator;
+        private Button btnArrowToExit;
         private Button btnTeleportPositionX;
         private Button btnTeleportPositionY;
         private Button btnTeleportPositionZ;
@@ -23,6 +24,7 @@ namespace GPSTool
         private Button btnPointToTeleport;
         private Button btnTeleportPositionDistanceMax;
         private Button btnTeleportToSpawn;
+        private Button btnTeleportToEndOfDungeon;
         public GPSToolController gPSToolController;
         public GPSToolHook gPSToolHook;
         public override void Init(MenuData menuData, Menu menu)
@@ -34,6 +36,7 @@ namespace GPSTool
             txtPlayerPositionY = menu.GetCustomReference("txt_PlayerPositionY").GetComponent<Text>();
             txtPlayerPositionZ = menu.GetCustomReference("txt_PlayerPositionZ").GetComponent<Text>();
             btnArrowsIndicator = menu.GetCustomReference("btn_ArrowsIndicator").GetComponent<Button>();
+            btnArrowToExit = menu.GetCustomReference("btn_ArrowToExit").GetComponent<Button>();
             btnTeleportPositionX = menu.GetCustomReference("btn_TeleportPositionX").GetComponent<Button>();
             btnTeleportPositionY = menu.GetCustomReference("btn_TeleportPositionY").GetComponent<Button>();
             btnTeleportPositionZ = menu.GetCustomReference("btn_TeleportPositionZ").GetComponent<Button>();
@@ -46,9 +49,11 @@ namespace GPSTool
             txtTeleportPositionDistance = menu.GetCustomReference("txt_TeleportPositionDistance").GetComponent<Text>();
             btnTeleportPositionDistanceMax = menu.GetCustomReference("btn_TeleportPositionDistanceMax").GetComponent<Button>();
             btnTeleportToSpawn = menu.GetCustomReference("btn_TeleportToSpawn").GetComponent<Button>();
+            btnTeleportToEndOfDungeon = menu.GetCustomReference("btn_TeleportToEndOfDungeon").GetComponent<Button>();
 
             // Add an event listener for buttons
             btnArrowsIndicator.onClick.AddListener(ClickArrowsIndicator);
+            btnArrowToExit.onClick.AddListener(ClickArrowToExit);
             btnTeleportPositionX.onClick.AddListener(ClickTeleportPositionX);
             btnTeleportPositionY.onClick.AddListener(ClickTeleportPositionY);
             btnTeleportPositionZ.onClick.AddListener(ClickTeleportPositionZ);
@@ -57,6 +62,7 @@ namespace GPSTool
             btnPointToTeleport.onClick.AddListener(ClickPointToTeleport);
             btnTeleportPositionDistanceMax.onClick.AddListener(ClickTeleportPositionDistanceMax);
             btnTeleportToSpawn.onClick.AddListener(ClickTeleportToSpawn);
+            btnTeleportToEndOfDungeon.onClick.AddListener(ClickTeleportToEndOfDungeon);
 
             // Initialization of datas
 
@@ -66,11 +72,13 @@ namespace GPSTool
             gPSToolController.data.PlayerPositionZGetSet = -999.0f;
             gPSToolController.data.RefreshPositionGetSet = false;
             gPSToolController.data.ToggleArrowsIndicatorGetSet = false;
+            gPSToolController.data.ToggleArrowToExitGetSet = false;
             gPSToolController.data.PlayerTeleportPositionConfirmButtonPressedGetSet = false;
             gPSToolController.data.PlayerFrameGetSet = false;
             gPSToolController.data.PlayerTeleportPositionDistanceGetSet = -999.0f;
             gPSToolController.data.PlayerTeleportPositionDistanceMaxGetSet = 50.0f;
             gPSToolController.data.PlayerTeleportToSpawnButtonPressedGetSet = false;
+            gPSToolController.data.PlayerTeleportToEndOfDungeonButtonPressedGetSet = false;
 
 
             gPSToolHook = menu.gameObject.AddComponent<GPSToolHook>();
@@ -85,6 +93,11 @@ namespace GPSTool
         public void ClickArrowsIndicator()
         {
             gPSToolController.data.ToggleArrowsIndicatorGetSet ^= true;
+            UpdateDataPageLeft1();
+        }
+        public void ClickArrowToExit()
+        {
+            gPSToolController.data.ToggleArrowToExitGetSet ^= true;
             UpdateDataPageLeft1();
         }
         public void ClickTeleportPositionX()
@@ -127,6 +140,11 @@ namespace GPSTool
             gPSToolController.data.PlayerTeleportToSpawnButtonPressedGetSet = true;
             UpdateDataPageRight1();
         }
+        public void ClickTeleportToEndOfDungeon()
+        {
+            gPSToolController.data.PlayerTeleportToEndOfDungeonButtonPressedGetSet = true;
+            UpdateDataPageRight1();
+        }
         public void UpdateDataPageLeft1()
         {
             // Display null if not in map or not in creature
@@ -144,6 +162,7 @@ namespace GPSTool
                 txtPlayerPositionZ.text = gPSToolController.data.PlayerPositionZGetSet.ToString("0.000");
             }
             btnArrowsIndicator.transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = gPSToolController.data.ToggleArrowsIndicatorGetSet ? "Enabled" : "Disabled";
+            btnArrowToExit.transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = gPSToolController.data.ToggleArrowToExitGetSet ? "Enabled" : "Disabled";
             btnPlayerFrame.transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = gPSToolController.data.PlayerFrameGetSet ? "Enabled" : "Disabled";
         }
 
@@ -204,7 +223,11 @@ namespace GPSTool
         {
             public GPSToolMenuModule menu;
 
-            void Update() => menu.UpdateDataPageLeft1();
+            void Update()
+            {
+                menu.UpdateDataPageLeft1();
+                menu.UpdateDataPageRight1();
+            }
         }
 
     }
