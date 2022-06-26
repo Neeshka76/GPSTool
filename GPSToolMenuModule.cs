@@ -23,6 +23,7 @@ namespace GPSTool
         private Button btnPlayerFrame;
         private Button btnPointToTeleport;
         private Button btnTeleportPositionDistanceMax;
+        private Button btnTeleportToMap;
         private Button btnTeleportToSpawn;
         private Button btnTeleportToEndOfDungeon;
         public GPSToolController gPSToolController;
@@ -50,6 +51,7 @@ namespace GPSTool
             btnTeleportPositionDistanceMax = menu.GetCustomReference("btn_TeleportPositionDistanceMax").GetComponent<Button>();
             btnTeleportToSpawn = menu.GetCustomReference("btn_TeleportToSpawn").GetComponent<Button>();
             btnTeleportToEndOfDungeon = menu.GetCustomReference("btn_TeleportToEndOfDungeon").GetComponent<Button>();
+            btnTeleportToMap = menu.GetCustomReference("btn_TeleportToMap").GetComponent<Button>();
 
             // Add an event listener for buttons
             btnArrowsIndicator.onClick.AddListener(ClickArrowsIndicator);
@@ -63,6 +65,7 @@ namespace GPSTool
             btnTeleportPositionDistanceMax.onClick.AddListener(ClickTeleportPositionDistanceMax);
             btnTeleportToSpawn.onClick.AddListener(ClickTeleportToSpawn);
             btnTeleportToEndOfDungeon.onClick.AddListener(ClickTeleportToEndOfDungeon);
+            btnTeleportToMap.onClick.AddListener(ClickTeleportToMap);
 
             // Initialization of datas
 
@@ -79,6 +82,7 @@ namespace GPSTool
             gPSToolController.data.PlayerTeleportPositionDistanceMaxGetSet = 50.0f;
             gPSToolController.data.PlayerTeleportToSpawnButtonPressedGetSet = false;
             gPSToolController.data.PlayerTeleportToEndOfDungeonButtonPressedGetSet = false;
+            gPSToolController.data.PlayerTeleportToMapButtonPressedGetSet = false;
 
 
             gPSToolHook = menu.gameObject.AddComponent<GPSToolHook>();
@@ -145,6 +149,11 @@ namespace GPSTool
             gPSToolController.data.PlayerTeleportToEndOfDungeonButtonPressedGetSet = true;
             UpdateDataPageRight1();
         }
+        public void ClickTeleportToMap()
+        {
+            gPSToolController.data.PlayerTeleportToMapButtonPressedGetSet = true;
+            UpdateDataPageRight1();
+        }
         public void UpdateDataPageLeft1()
         {
             // Display null if not in map or not in creature
@@ -200,6 +209,22 @@ namespace GPSTool
                     gPSToolController.data.PlayerTeleportPositionDistanceMaxButtonPressedGetSet = false;
                     gPSToolController.data.KeyboardFinishEnterButtonPressedGetSet = false;
                 }
+            }
+            if (gPSToolController.data.LevelIsHomeGetSet && !btnTeleportToMap.gameObject.activeInHierarchy)
+            {
+                btnTeleportToMap.gameObject.SetActive(true);
+            }
+            if (!gPSToolController.data.LevelIsHomeGetSet && btnTeleportToMap.gameObject.activeInHierarchy)
+            {
+                btnTeleportToMap.gameObject.SetActive(false);
+            }
+            if (gPSToolController.data.LevelIsDungeonGetSet && !btnTeleportToEndOfDungeon.gameObject.activeInHierarchy)
+            {
+                btnTeleportToEndOfDungeon.gameObject.SetActive(true);
+            }
+            if (!gPSToolController.data.LevelIsDungeonGetSet && btnTeleportToEndOfDungeon.gameObject.activeInHierarchy)
+            {
+                btnTeleportToEndOfDungeon.gameObject.SetActive(false);
             }
             btnPointToTeleport.transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = gPSToolController.data.PointToTeleportGetSet ? "Enabled" : "Disabled";
             // Refresh the position teleport to when activate the function point to Teleport

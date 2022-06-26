@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Diagnostics.Tracing;
 using ThunderRoad;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -31,72 +30,68 @@ namespace GPSTool
         private Quaternion rotationOfSpawn = new Quaternion();
         private Vector3 positionOfEndOfDungeon = new Vector3(0f, 0f, 0f);
         private Quaternion rotationOfEndOfDungeon = new Quaternion();
+        private Vector3 positionOfMap = new Vector3(0f, 0f, 0f);
+        private Quaternion rotationOfMap = new Quaternion();
         private bool isPossessed = false;
         private Vector3 destinationToReach = new Vector3(0f, 0f, 0f);
         private int numberOfRoomsInLevel;
+        private string levelName;
         // When a level is loaded
         public override IEnumerator OnLoadCoroutine()
         {
             gPSToolController = GameManager.local.gameObject.GetComponent<GPSToolController>();
             // Create an event manager on creature spawn
-            EventManager.onCreatureSpawn += EventManager_onCreatureSpawn;
-            EventManager.onLevelUnload += EventManager_onLevelUnload;
             EventManager.onUnpossess += EventManager_onUnpossess;
             EventManager.onPossess += EventManager_onPossess;
             return base.OnLoadCoroutine();
         }
 
-        private void EventManager_onCreatureSpawn(Creature creature)
-        {
-            // If creature is not hidden and isn't the player and the selector not on default
-            if (creature.isPlayer)
-            {
-                GetPositionOfPlayer();
-            }
-            if (Level.current.dungeon != null)
-            {
-                GetPositionOfEndOfDungeon();
-                Level.current.dungeon.onPlayerChangeRoom += Dungeon_onPlayerChangeRoom;
-                numberOfRoomsInLevel = Level.current.dungeon.rooms.Count;
-                destinationToReach =  Level.current.dungeon.rooms[1].entryDoor.transform.position;
-            }
-        }
-
         private void EventManager_onUnpossess(Creature creature, EventTime eventTime)
         {
-            if (creature.isPlayer)
+            if (eventTime == EventTime.OnStart)
             {
-                //Debug.Log("GPSTool : LevelModule : Unpossessed Player !");
-                if (lineRenderer != null)
+                if (creature.isPlayer)
                 {
-                    Object.Destroy(lineRenderer.gameObject);
-                }
-                if (arrowsIndicator != null)
-                {
-                    Object.Destroy(arrowsIndicator.gameObject);
-                }
-                if (arrowToExit != null)
-                {
-                    Object.Destroy(arrowToExit.gameObject);
-                }
-                Player.local.creature.handRight?.SetOpenPose();
-                Player.local.creature.handRight?.SetClosePose();
-                isPossessed = false;
-                if (Level.current.dungeon != null)
-                {
-                    Level.current.dungeon.onPlayerChangeRoom -= Dungeon_onPlayerChangeRoom;
+                    //Debug.Log("GPSTool : LevelModule : Unpossessed Player !");
+                    if (lineRenderer != null)
+                    {
+                        Object.Destroy(lineRenderer.gameObject);
+                    }
+                    if (arrowsIndicator != null)
+                    {
+                        Object.Destroy(arrowsIndicator.gameObject);
+                    }
+                    if (arrowToExit != null)
+                    {
+                        Object.Destroy(arrowToExit.gameObject);
+                    }
+                    //Player.local.creature.handRight?.SetOpenPose();
+                    //Player.local.creature.handRight?.SetClosePose();
+                    isPossessed = false;
+                    if (Level.current.dungeon != null)
+                    {
+                        Level.current.dungeon.onPlayerChangeRoom -= Dungeon_onPlayerChangeRoom;
+                    }
                 }
             }
         }
 
         private void EventManager_onPossess(Creature creature, EventTime eventTime)
         {
-            isPossessed = true;
-        }
-
-        private void EventManager_onLevelUnload(LevelData levelData, EventTime eventTime)
-        {
-            //Debug.Log("GPSTool : LevelModule : LevelUnLoaded !");
+            if (eventTime == EventTime.OnEnd)
+            {
+                isPossessed = true;
+                levelName = Level.current.data.id;
+                GetPositionOfPlayer();
+                GetPositionOfMap();
+                if (Level.current.dungeon != null)
+                {
+                    Level.current.dungeon.onPlayerChangeRoom += Dungeon_onPlayerChangeRoom;
+                    numberOfRoomsInLevel = Level.current.dungeon.rooms.Count;
+                    destinationToReach = Level.current.dungeon.rooms[1].entryDoor.transform.position;
+                    GetPositionOfEndOfDungeon();
+                }
+            }
         }
 
         private void Dungeon_onPlayerChangeRoom(Room oldRoom, Room newRoom)
@@ -232,8 +227,8 @@ namespace GPSTool
                         arrowToExit.SetActive(true);
                         arrowToExit.transform.localScale = Vector3.one * 0.4f;
                         arrowToExit.transform.SetParent(Player.currentCreature.handLeft.transform);
-                        arrowToExit.transform.position = SnippetCode.SnippetCode.PosAboveBackOfHand(Player.currentCreature.handLeft, 0.25f);
-                        arrowToExit.transform.rotation = Quaternion.LookRotation(SnippetCode.SnippetCode.FromToDirection(Player.currentCreature.transform.position, destinationToReach), Vector3.up);
+                        arrowToExit.transform.position = Snippet.PosAboveBackOfHand(Player.currentCreature.handLeft, 0.25f);
+                        arrowToExit.transform.rotation = Quaternion.LookRotation(destinationToReach - Player.currentCreature.transform.position, Vector3.up);
                     }
 
                     // Activate arrows
@@ -245,8 +240,8 @@ namespace GPSTool
                         {
                             transArrowToExit = arrowToExit.transform;
                             transArrowToExit.position = Player.local.creature.handRight.fingerIndex.tip.transform.position;
-                            transArrowToExit.transform.position = SnippetCode.SnippetCode.PosAboveBackOfHand(Player.currentCreature.handLeft, 0.5f);
-                            transArrowToExit.transform.rotation = Quaternion.LookRotation(SnippetCode.SnippetCode.FromToDirection(Player.currentCreature.transform.position, destinationToReach), Vector3.up);
+                            transArrowToExit.transform.position = Snippet.PosAboveBackOfHand(Player.currentCreature.handLeft, 0.5f);
+                            transArrowToExit.transform.rotation = Quaternion.LookRotation(destinationToReach - Player.currentCreature.transform.position, Vector3.up);
                         }
                     }
                 }
@@ -291,6 +286,10 @@ namespace GPSTool
                     {
                         TeleportToEndOfDungeon();
                     }
+                    if (gPSToolController.data.PlayerTeleportToMapButtonPressedGetSet == true)
+                    {
+                        TeleportToMap();
+                    }
                 }
                 else
                 {
@@ -317,15 +316,10 @@ namespace GPSTool
                 {
                     posActivated = true;
                     // Set the pointing hand pose and then extend the index !
-                    Player.local.creature.handRight?.SetOpenPose(Catalog.GetData<HandPoseData>("Pointing"));
-                    Player.local.creature.handRight?.SetClosePose(Catalog.GetData<HandPoseData>("Pointing"));
-                    Player.local.creature.handRight?.UpdatePoseIndex(0.0f);
                 }
                 else
                 {
                     posActivated = false;
-                    Player.local.creature.handRight?.SetOpenPose();
-                    Player.local.creature.handRight?.SetClosePose();
                 }
             }
         }
@@ -338,16 +332,16 @@ namespace GPSTool
             {
                 if (gPSToolController.data.PlayerFrameGetSet == true)
                 {
-                    Player.local.Teleport(Player.local.transform.position + positionToTeleport, Quaternion.identity);
+                    Player.local.Teleport(Player.local.transform.position + positionToTeleport, Player.local.creature.transform.rotation);
                 }
                 else
                 {
-                    Player.local.Teleport(positionToTeleport, Quaternion.identity);
+                    Player.local.Teleport(positionToTeleport, Player.local.creature.transform.rotation);
                 }
             }
             else
             {
-                Player.local.Teleport(positionToTeleport, Quaternion.identity);
+                Player.local.Teleport(positionToTeleport, Player.local.creature.transform.rotation);
             }
             gPSToolController.data.PlayerTeleportPositionConfirmButtonPressedGetSet = false;
         }
@@ -361,9 +355,26 @@ namespace GPSTool
         }
         public void TeleportToEndOfDungeon()
         {
-            positionToTeleport = positionOfEndOfDungeon;
-            Player.local.Teleport(positionToTeleport, Quaternion.identity);
+            Player.local.Teleport(positionOfEndOfDungeon, rotationOfEndOfDungeon);
             gPSToolController.data.PlayerTeleportToEndOfDungeonButtonPressedGetSet = false;
+        }
+        public void TeleportToMap()
+        {
+            Player.local.Teleport(positionOfMap, rotationOfMap);
+            gPSToolController.data.PlayerTeleportToMapButtonPressedGetSet = false;
+        }
+        private void GetPositionOfMap()
+        {
+            if (levelName == "Home")
+            {
+                gPSToolController.data.LevelIsHomeGetSet = true;
+                positionOfMap = new Vector3(71.8f, -4f, -75f);
+                rotationOfMap = Quaternion.Euler(0, -100f, 0);
+            }
+            else
+            {
+                gPSToolController.data.LevelIsHomeGetSet = false;
+            }
         }
         private void GetPositionOfPlayer()
         {
@@ -376,6 +387,11 @@ namespace GPSTool
             {
                 positionOfEndOfDungeon = spawner.transform.position;
                 rotationOfEndOfDungeon = spawner.transform.rotation;
+                gPSToolController.data.LevelIsDungeonGetSet = true;
+            }
+            else
+            {
+                gPSToolController.data.LevelIsDungeonGetSet = false;
             }
         }
     }

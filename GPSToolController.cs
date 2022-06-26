@@ -38,6 +38,8 @@ namespace GPSTool
         public bool PlayerTeleportToSpawnButtonPressedGetSet { get; set; }
         // Set if Player has pressed the button Teleport To End Of Dungeon
         public bool PlayerTeleportToEndOfDungeonButtonPressedGetSet { get; set; }
+        // Set if Player has pressed the button Teleport To Map
+        public bool PlayerTeleportToMapButtonPressedGetSet { get; set; }
         // Set if Keyboard has pressed enter button finish
         public bool KeyboardFinishEnterButtonPressedGetSet { get; set; }
         // Info that the player has confirm the teleportation
@@ -50,6 +52,10 @@ namespace GPSTool
         public bool PointToTeleportGetSet { get; set; }
         // Set if has to refresh the position
         public bool RefreshPositionGetSet { get; set; }
+        // Set if Level is home
+        public bool LevelIsHomeGetSet { get; set; }
+        // Set if Level is dungeon
+        public bool LevelIsDungeonGetSet { get; set; }
     }
 
     public class GPSToolController : MonoBehaviour
