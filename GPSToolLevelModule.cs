@@ -332,16 +332,16 @@ namespace GPSTool
             {
                 if (gPSToolController.data.PlayerFrameGetSet == true)
                 {
-                    Player.local.Teleport(Player.local.transform.position + positionToTeleport, Player.local.creature.transform.rotation);
+                    Player.local.Teleport(Player.local.transform.position + positionToTeleport, Player.local.transform.rotation, useHeadPosition:false);
                 }
                 else
                 {
-                    Player.local.Teleport(positionToTeleport, Player.local.creature.transform.rotation);
+                    Player.local.Teleport(positionToTeleport, Player.local.transform.rotation, useHeadPosition: false);
                 }
             }
             else
             {
-                Player.local.Teleport(positionToTeleport, Player.local.creature.transform.rotation);
+                Player.local.Teleport(positionToTeleport, Player.local.transform.rotation, useHeadPosition: false);
             }
             gPSToolController.data.PlayerTeleportPositionConfirmButtonPressedGetSet = false;
         }
@@ -350,17 +350,17 @@ namespace GPSTool
         {
             positionToTeleport = positionOfSpawn;
             orientationToTeleport = rotationOfSpawn;
-            Player.local.Teleport(positionToTeleport, orientationToTeleport);
+            Player.local.Teleport(positionToTeleport, orientationToTeleport, useHeadPosition: false);
             gPSToolController.data.PlayerTeleportToSpawnButtonPressedGetSet = false;
         }
         public void TeleportToEndOfDungeon()
         {
-            Player.local.Teleport(positionOfEndOfDungeon, rotationOfEndOfDungeon);
+            Player.local.Teleport(positionOfEndOfDungeon, rotationOfEndOfDungeon, useHeadPosition: false);
             gPSToolController.data.PlayerTeleportToEndOfDungeonButtonPressedGetSet = false;
         }
         public void TeleportToMap()
         {
-            Player.local.Teleport(positionOfMap, rotationOfMap);
+            Player.local.Teleport(positionOfMap, rotationOfMap, useHeadPosition:false);
             gPSToolController.data.PlayerTeleportToMapButtonPressedGetSet = false;
         }
         private void GetPositionOfMap()

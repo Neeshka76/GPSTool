@@ -12,7 +12,6 @@ namespace GPSTool
     {
         private GameObject keyboard;
         AsyncOperationHandle<GameObject> handleKeyboard;
-        public Transform transKeyboard;
         private bool previousStateKeyboard = false;
         private bool currentStateKeyboard = false;
         private bool errorInput = false;
@@ -57,9 +56,13 @@ namespace GPSTool
                     keyboard = handleKeyboard.WaitForCompletion();
                     keyboard = UnityEngine.Object.Instantiate(keyboard);
                     keyboard.SetActive(false);
-                    keyboard.transform.position = (Player.local.creature.transform.position + new Vector3(0.0f, 2.0f, 0.0f));
+
+                    keyboard.transform.SetParent(MenuBook.local.gameObject.transform);
+                    keyboard.transform.localPosition = new Vector3(0f, 0.35f, 0.04f);
+                    keyboard.transform.localRotation = MenuBook.local.gameObject.transform.rotation * Quaternion.Euler(0f, 180f, 0f);
                     keyboardCanvas = keyboard.transform.GetChild(1).gameObject.transform.GetChild(2).gameObject;
                     txtInput = keyboard.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(0).gameObject.GetComponent<Text>();
+
                     button7 = keyboardCanvas.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject.GetComponent<Button>();
                     button8 = keyboardCanvas.transform.GetChild(0).gameObject.transform.GetChild(1).gameObject.GetComponent<Button>();
                     button9 = keyboardCanvas.transform.GetChild(0).gameObject.transform.GetChild(2).gameObject.GetComponent<Button>();
@@ -109,7 +112,6 @@ namespace GPSTool
                     if (keyboard != null && currentStateKeyboard != previousStateKeyboard && previousStateKeyboard == false)
                     {
                         keyboard.SetActive(true);
-                        transKeyboard = keyboard.transform;
                         keyboard.layer = 5;
                     }
                     // Deactivate the keyboard
@@ -119,11 +121,6 @@ namespace GPSTool
                     }
                     // Set the new state
                     previousStateKeyboard = currentStateKeyboard;
-                    if (keyboard.activeSelf)
-                    {
-                        transKeyboard.position = MenuBook.local.gameObject.transform.position + new Vector3(0.0f, 0.4f, 0.0f);
-                        transKeyboard.rotation = MenuBook.local.gameObject.transform.rotation;
-                    }
                 }
             }
         }
